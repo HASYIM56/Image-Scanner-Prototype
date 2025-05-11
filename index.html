@@ -2,27 +2,79 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Image Scanner Prototype - Scan and extract text from images using advanced OCR technology. Quickly upload and process images to retrieve structured and highlighted text results.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Image Scanner Prototype - Scan and extract text from images using advanced OCR technology.">
   <title>Image Scanner (Prototype)</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
+    :root {
+      --primary-green: #1DB954;
+      --green-dark: #128C45;
+      --bg-dark: #0B0B0C;
+      --card-bg: rgba(26, 26, 26, 0.95);
+      --text-light: #E5E5E5;
+      --text-muted: #B0B0B0;
+      --border-color: #2F2F2F;
+    }
+
     body {
-      background-color: #f8f9fa;
+      background: linear-gradient(135deg, #0B0B0C 0%, #141414 100%);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 2rem;
+      color: var(--text-light);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     .scanner-container {
-      max-width: 600px;
+      max-width: 640px;
       width: 100%;
-      background: #ffffff;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      background: var(--card-bg);
+      padding: 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(8px);
+    }
+
+    h2 {
+      color: var(--primary-green);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .description {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 1.8rem;
+      text-align: center;
+    }
+
+    .form-label {
+      color: var(--text-muted);
+    }
+
+    .form-control {
+      background-color: #141414;
+      color: var(--text-light);
+      border: 1px solid #3A3A3A;
+      border-radius: 8px;
+    }
+
+    .form-control::file-selector-button {
+      background-color: var(--primary-green);
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .form-control::file-selector-button:hover {
+      background-color: var(--green-dark);
     }
 
     #preview {
@@ -30,30 +82,69 @@
       height: auto;
       display: none;
       margin-top: 1rem;
-      border: 1px solid #dee2e6;
+      border: 1px solid #2E2E2E;
       border-radius: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-green), var(--green-dark));
+      border: none;
+      font-weight: 600;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--green-dark), var(--primary-green));
     }
 
     #formattedResult p {
       margin-bottom: 0.75rem;
       line-height: 1.6;
+      color: var(--text-light);
     }
 
     #formattedResult strong {
-      color: #d63384;
+      color: var(--primary-green);
+    }
+
+    #formattedResult mark {
+      background-color: #2D2D2D;
+      padding: 0.2em 0.3em;
+      border-radius: 4px;
+      color: #CCCCCC;
+    }
+
+    #formattedResult code {
+      background-color: #292929;
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+      font-size: 90%;
+      color: #D4D4D4;
+    }
+
+    #formattedResult em {
+      color: var(--green-dark);
+      font-style: normal;
+      font-weight: 500;
     }
 
     .section-title {
       font-weight: 600;
       font-size: 1.2rem;
       margin-top: 1rem;
+      color: var(--primary-green);
     }
 
-    .description {
-      font-size: 0.95rem;
-      color: #6c757d;
-      margin-bottom: 1.5rem;
-      text-align: center;
+    .alert-info {
+      background-color: rgba(26, 26, 26, 0.8);
+      border: 1px solid #3A3A3A;
+      border-radius: 12px;
+    }
+
+    .spinner-border.text-primary {
+      color: var(--primary-green) !important;
     }
   </style>
 </head>
@@ -61,7 +152,7 @@
 
   <div class="scanner-container">
     <h2 class="text-center mb-2">Image Scanner</h2>
-    <p class="description">Scan and extract text from images using intelligent OCR processing. Designed for efficiency, accuracy, and clarity of results.</p>
+    <p class="description">Scan and extract text from images using intelligent OCR processing.</p>
 
     <div class="mb-3">
       <label for="imageInput" class="form-label">Upload an Image</label>
@@ -74,7 +165,6 @@
       <button id="scanBtn" class="btn btn-primary">Scan Image</button>
     </div>
 
-    <!-- Loading Spinner -->
     <div id="loading" class="mt-3 text-center d-none">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Scanning...</span>
@@ -82,7 +172,6 @@
       <div class="mt-2">Scanning image, please wait...</div>
     </div>
 
-    <!-- Result Section -->
     <div id="result" class="mt-4 alert alert-info d-none">
       <div class="section-title">Scan Result:</div>
       <div id="formattedResult"></div>
@@ -135,9 +224,16 @@
         const rawText = data.result || "No result found.";
 
         const lines = rawText.split('\n').filter(line => line.trim() !== '');
+
         const formattedHTML = lines.map((line, index) => {
-          const highlightedLine = line.replace(/(exam\S*)/gi, '<strong>$1</strong>');
-          return `<p><span class="text-secondary">${index + 1}.</span> ${highlightedLine}</p>`;
+          let formattedLine = line
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/(exam\S*)/gi, '<strong>$1</strong>')
+            .replace(/\b(image|figure|diagram|photo|graph|chart)\b/gi, '<mark>$1</mark>')
+            .replace(/\b(left|right|top|bottom|center|above|below)\b/gi, '<em>$1</em>')
+            .replace(/(\d{2,4}\s?(px|mm|cm|in)?)/gi, '<code>$1</code>');
+
+          return `<p><span class="text-secondary">${index + 1}.</span> ${formattedLine}</p>`;
         }).join('');
 
         formattedResult.innerHTML = formattedHTML;
@@ -152,4 +248,4 @@
   </script>
 
 </body>
-</html>
+        </html>
